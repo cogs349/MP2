@@ -25,14 +25,19 @@ __global__ void matrixMul(float* A, float* B, float* C, int width) {
 */
 
 
+
 __global__ void matrixMul(float* A, float* B, float* C, int width) {
     __shared__ float share_A[TILE_WIDTH * TILE_WIDTH];
     __shared__ float share_B[TILE_WIDTH * TILE_WIDTH];
 
-    int bx = blockIdx.x, by = blockIdx.y;
-    int tx = threadIdx.x, ty = threadIdx.y;
-    int row = by* TILE_WIDTH + ty;
-    int col = bx * TILE_WIDTH +tx;
+
+ 
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+    int bx = blockIdx.x;
+    int by = blockIdx.y;
+    int row = by * blockDim.y + ty;
+    int col = bx * blockDim.y +tx;
 
     float sum = 0.0;
 
@@ -46,7 +51,7 @@ __global__ void matrixMul(float* A, float* B, float* C, int width) {
 
 
         //check if the shared indexing of A tile is out of bounds (row matrix)
-        /*if (ty * TILE_WIDTH + tx < width) {
+        if (m * TILE_WIDTH + tx < width) {
             share_A[ty * TILE_WIDTH + tx] = A[A_index];
         }
         else {
@@ -54,13 +59,13 @@ __global__ void matrixMul(float* A, float* B, float* C, int width) {
         }
 
         //check if the shared indexing of the B tile is out of bounds (column matrix)
-        if (tx * TILE_WIDTH + ty < width) {
-            share_B[tx * TILE_WIDTH + ty] = B[B_index];
+        if (m * TILE_WIDTH + ty < width) {
+            share_B[ty * TILE_WIDTH + tx] = B[B_index];
         }
         else {
-            share_B[tx * TILE_WIDTH + ty] = 0.0;
+            share_B[ty * TILE_WIDTH + tx] = 0.0;
         }
-        */
+        
         
         
         __syncthreads();
@@ -86,7 +91,7 @@ void matrixMulCPU(float* A, float* B, float* C, int width) {
                 sum += A[i * width + k] * B[k * width + j];
             }
             C[i * width + j] = sum;
-        }
+        }   
     }
 }
 
