@@ -7,7 +7,7 @@
 #include <cstdlib>   // Include for rand() function
 #include <random>
 
-#define TILE_WIDTH 5
+#define TILE_WIDTH 25
 
 /*/ Kernel function to perform matrix multiplication on GPU
 __global__ void matrixMul(float* A, float* B, float* C, int width) {
@@ -122,7 +122,7 @@ int main() {
     cudaSetDevice(0);
 
     // Matrix size
-    int width = 10;
+    int width = 1500;
     int size = width * width * sizeof(float);
 
     // Allocate memory for host matrices
@@ -192,7 +192,7 @@ int main() {
     cudaEventRecord(stop, 0);
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&milliseconds, start, stop);
-    printf("GPU Kernel took: %f\n", milliseconds);
+    printf("GPU Kernel took: %.3f\n", milliseconds);
 
     cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
     /* Print GPU result
@@ -221,13 +221,13 @@ int main() {
         }
     }
 
-    for (int e = 0; e < width * width; e++) {
+    /*for (int e = 0; e < width * width; e++) {
         printf(" %.3f\n", h_C[e]);
     }
 
     for (int w = 0; w < width * width; w++) {
         printf(" %.3f\n", h_C_CPU[w]);
-    }
+    }*/
 
 
 
